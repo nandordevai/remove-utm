@@ -7,29 +7,29 @@ export default class UtmRemoverPlugin extends Plugin {
 	async onload() {
 		console.log('loading remove-utm')
 		await this.loadSettings()
+		this.addCommand({
+			id: 'paste-clean-url',
+			name: 'Paste and remove UTM trackers',
+			hotkeys: [{ modifiers: ['Shift', 'Mod'], key: 'v'}],
+			editorCallback: async(editor: Editor, _view: MarkdownView) => {
+				const clipboardData = await navigator.clipboard.readText()
+				if (!clipboardData) return
 
-		this.registerDomEvent(window, 'paste', (evt: ClipboardEvent) => {
-			const clipboardData = evt.clipboardData?.getData('text/plain')
-			if (!clipboardData) return
+				try {
+					const url = new URL(clipboardData)
+					const hasParam = this.settings.scrubList.some(param => url.searchParams.has(param))
 
-			try {
-				const url = new URL(clipboardData)
-				const hasParam = this.settings.scrubList.some(param => url.searchParams.has(param))
+					if (hasParam) {
+						this.settings.scrubList.forEach(param => url.searchParams.delete(param))
 
-				if (hasParam) {
-					evt.stopImmediatePropagation()
-					evt.preventDefault()
-
-					this.settings.scrubList.forEach(param => url.searchParams.delete(param))
-
-					const cleanedUrl = url.toString()
-					const view = this.app.workspace.getActiveViewOfType(MarkdownView)
-					if (view) {
-						view.editor.replaceSelection(cleanedUrl)
+						const cleanedUrl = url.toString()
+						editor.replaceSelection(cleanedUrl)
 					}
+				} catch (e) { // Not a URL
+					console.log(e)
 				}
-			} catch (e) { /* Not a URL */ }
-		}, true)
+			},
+		})
 
 		this.addSettingTab(new UtmSettingTab(this.app, this))
 	}

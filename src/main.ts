@@ -1,4 +1,4 @@
-import { Plugin, MarkdownView } from 'obsidian'
+import { Plugin, MarkdownView, Editor } from 'obsidian'
 import { UtmSettings, DEFAULT_SETTINGS, UtmSettingTab } from './settings'
 
 export default class UtmRemoverPlugin extends Plugin {
@@ -24,9 +24,12 @@ export default class UtmRemoverPlugin extends Plugin {
 
 						const cleanedUrl = url.toString()
 						editor.replaceSelection(cleanedUrl)
+					} else {
+						editor.replaceSelection(clipboardData)
 					}
 				} catch (e) { // Not a URL
 					console.log(e)
+					editor.replaceSelection(clipboardData)
 				}
 			},
 		})

@@ -6,7 +6,7 @@ export interface UtmSettings {
 }
 
 export const DEFAULT_SETTINGS: UtmSettings = {
-	scrubList: ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
+	scrubList: ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id']
 }
 
 export class UtmSettingTab extends PluginSettingTab {
